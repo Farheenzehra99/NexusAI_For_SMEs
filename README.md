@@ -88,7 +88,7 @@ The app will be available at `http://localhost:3000`.
 | `DATABASE_URL` | `sqlite:///./nexusai.db` | SQLAlchemy connection string |
 | `ALLOWED_ORIGINS` | `http://localhost:3000` | CORS origins (comma-separated) |
 | `GEMINI_API_KEY` | *(empty)* | Google Gemini API key — powers agent narration and sentiment classification |
-| `GEMINI_MODEL` | `gemini-3.6-flash` | Gemini model for all LLM calls |
+| `GEMINI_MODEL` | `gemini-3.5-flash-lite` | Gemini model for all LLM calls (lite tier = higher free quota) |
 | `DEBUG` | `true` | Enable debug logging |
 
 ### Frontend (`frontend/.env.local`)

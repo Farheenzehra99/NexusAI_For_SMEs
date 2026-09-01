@@ -7,7 +7,7 @@ failure mode (missing key, network error, timeout, quota exhaustion, bad
 response) degrades gracefully to None, so callers fall back to a
 deterministic template written by code.
 
-Uses the Google Gemini API (gemini-3.6-flash by default) through only
+Uses the Google Gemini API (gemini-3.5-flash-lite by default) through only
 the Python standard library (urllib) — no extra dependency. The API key
 is sent in the x-goog-api-key header, never in a URL, so it cannot leak
 into logs or error messages.

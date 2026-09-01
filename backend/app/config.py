@@ -7,7 +7,7 @@ class Settings(BaseSettings):
     allowed_origins: str = "http://localhost:3000"
     # Google Gemini — powers every AI narration and sentiment classification.
     gemini_api_key: str = ""
-    gemini_model: str = "gemini-3.6-flash"
+    gemini_model: str = "gemini-3.5-flash-lite"
     llm_timeout_seconds: int = 30
     debug: bool = True
 
