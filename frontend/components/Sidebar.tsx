@@ -14,12 +14,7 @@ import {
   ChevronLeft,
   Loader2,
 } from "lucide-react";
-
-const navItems = [
-  { href: "/", icon: LayoutDashboard, label: "Dashboard" },
-  { href: "/command-center", icon: Command, label: "AI Command Center", primary: true },
-  { href: "/ai-employees", icon: Users, label: "AI Employees" },
-];
+import { useLanguage } from "@/context/LanguageContext";
 
 function useWorkforceActive(): boolean {
   const [active, setActive] = useState(false);
@@ -37,6 +32,13 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
   const [collapsed, setCollapsed] = useState(false);
   const pathname = usePathname();
   const workforceActive = useWorkforceActive();
+  const { t } = useLanguage();
+
+  const navItems = [
+    { href: "/", icon: LayoutDashboard, label: t("sidebar.dashboard") },
+    { href: "/command-center", icon: Command, label: t("sidebar.command_center"), primary: true },
+    { href: "/ai-employees", icon: Users, label: t("sidebar.ai_employees") },
+  ];
 
   useEffect(() => {
     if (window.matchMedia("(max-width: 767px)").matches) setCollapsed(true);
@@ -143,7 +145,7 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
               <AnimatePresence>
                 {!collapsed && (
                   <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="whitespace-nowrap overflow-hidden">
-                    Notifications
+                    {t("sidebar.notifications")}
                   </motion.span>
                 )}
               </AnimatePresence>
@@ -160,7 +162,7 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
               <AnimatePresence>
                 {!collapsed && (
                   <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="whitespace-nowrap overflow-hidden">
-                    Settings
+                    {t("sidebar.settings")}
                   </motion.span>
                 )}
               </AnimatePresence>
@@ -228,4 +230,3 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
     </div>
   );
 }
-

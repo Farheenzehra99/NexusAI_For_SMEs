@@ -1,0 +1,32 @@
+{
+  "sidebar": {
+    "dashboard": "ڈیش بورڈ",
+    "ai_employees": "اے آئی ملازمین",
+    "command_center": "کمانڈ سینٹر",
+    "notifications": "اطلاعات",
+    "settings": "ترتیبات"
+  },
+  "dashboard": {
+    "welcome": "صبح بخیر",
+    "health_score": "کاروبار کی صحت کا اسکور",
+    "revenue": "آمدنی اور منافع کا رجحان",
+    "inventory": "انوینٹری الرٹس",
+    "recommendations": "اے آئی کی تجاویز",
+    "activity": "لائیو ورک فورس ایکٹیویٹی"
+  },
+  "settings": {
+    "title": "ترتیبات",
+    "subtitle": "اپنے اکاؤنٹ اور پلیٹ فارم کی ترجیحات کا نظم کریں",
+    "profile": "پروفائل",
+    "preferences": "ترجیحات",
+    "api_keys": "اے پی آئی کیز",
+    "security": "سیکیورٹی",
+    "save": "تبدیلیاں محفوظ کریں",
+    "language": "زبان",
+    "language_desc": "اپنی پسندیدہ زبان منتخب کریں"
+  },
+  "command": {
+    "ask": "سی ای او ایجنٹ سے پوچھیں...",
+    "thinking": "سی ای او ایجنٹ سوچ رہا ہے..."
+  }
+}

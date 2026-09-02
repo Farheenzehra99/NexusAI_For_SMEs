@@ -1,0 +1,32 @@
+{
+  "sidebar": {
+    "dashboard": "Dashboard",
+    "ai_employees": "AI Mulazmeen",
+    "command_center": "Command Center",
+    "notifications": "Ittelaat",
+    "settings": "Settings"
+  },
+  "dashboard": {
+    "welcome": "Subah Bakhair",
+    "health_score": "Business Health Score",
+    "revenue": "Aamdani aur Munafa ka Rujhaan",
+    "inventory": "Inventory Alerts",
+    "recommendations": "AI Mashwaray",
+    "activity": "Live Workforce Activity"
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Apne account aur platform ki tarjeehaat manage karein",
+    "profile": "Profile",
+    "preferences": "Preferences",
+    "api_keys": "API Keys",
+    "security": "Security",
+    "save": "Tabdeeliyan Save Karein",
+    "language": "Zaban",
+    "language_desc": "Apni pasandeeda zaban muntakhib karein"
+  },
+  "command": {
+    "ask": "CEO Agent se puchiye...",
+    "thinking": "CEO Agent soch raha hai..."
+  }
+}

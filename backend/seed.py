@@ -38,6 +38,8 @@ from app.models.business import (
     MarketingCampaign,
     Customer,
     AgentActivity,
+    UserSettings,
+    Notification,
 )
 
 
@@ -336,6 +338,26 @@ def seed(*, reset: bool = False):
                 action=action, finding=finding, data_points=data_pts,
                 created_at=now - timedelta(minutes=mins_ago),
             ))
+
+        # --- Settings and Notifications ---
+        db.add(UserSettings(
+            business_id=biz.id, language="en", email_notifications=1, proactive_actions=1
+        ))
+        db.add(Notification(
+            business_id=biz.id, type="alert", title="Critical Inventory Alert", 
+            message="Embroidered Kurti White (AG-KT-001) stock is down to 5 units.",
+            is_read=0, created_at=now - timedelta(minutes=10)
+        ))
+        db.add(Notification(
+            business_id=biz.id, type="info", title="Marketing Campaign Paused", 
+            message="Khan Fabrics Counter campaign was automatically paused by the Marketing Agent due to low ROI.",
+            is_read=0, created_at=now - timedelta(hours=1)
+        ))
+        db.add(Notification(
+            business_id=biz.id, type="success", title="Weekly Report Generated", 
+            message="Your customized business health report for week 34 is ready.",
+            is_read=1, created_at=now - timedelta(hours=3)
+        ))
 
         db.commit()
         print("Database seeded successfully with Ali Garments data.")

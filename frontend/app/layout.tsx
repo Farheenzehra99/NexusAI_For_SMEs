@@ -1,9 +1,14 @@
-import type { Metadata } from "next";
 import "./globals.css";
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+import { LanguageProvider } from "@/context/LanguageContext";
+import GlobalNotificationListener from "@/components/GlobalNotificationListener";
+
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "NexusAI for SMEs — AI-Powered Workforce",
-  description: "AI workforce platform for Pakistani SMEs",
+  title: "NexusAI - AI Workforce",
+  description: "AI Workforce platform for Pakistani SMEs",
 };
 
 export default function RootLayout({
@@ -13,7 +18,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body className={`${inter.className} bg-[#0a0f18] text-white antialiased`}>
+        <LanguageProvider>
+          {children}
+          <GlobalNotificationListener />
+        </LanguageProvider>
+      </body>
     </html>
   );
 }

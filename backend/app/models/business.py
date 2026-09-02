@@ -28,7 +28,8 @@ class Business(Base):
     campaigns = relationship("MarketingCampaign", back_populates="business")
     customers = relationship("Customer", back_populates="business")
     agent_activities = relationship("AgentActivity", back_populates="business")
-
+    notifications = relationship("Notification", back_populates="business")
+    settings = relationship("UserSettings", back_populates="business", uselist=False)
 
 class Product(Base):
     __tablename__ = "products"
@@ -173,3 +174,30 @@ class AgentActivity(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
 
     business = relationship("Business", back_populates="agent_activities")
+
+
+class Notification(Base):
+    __tablename__ = "notifications"
+
+    id = Column(Integer, primary_key=True, index=True)
+    business_id = Column(Integer, ForeignKey("businesses.id"))
+    type = Column(String, default="info") # alert, info, success
+    title = Column(String, nullable=False)
+    message = Column(Text, nullable=False)
+    is_read = Column(Integer, default=0)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    business = relationship("Business", back_populates="notifications")
+
+
+class UserSettings(Base):
+    __tablename__ = "user_settings"
+
+    id = Column(Integer, primary_key=True, index=True)
+    business_id = Column(Integer, ForeignKey("businesses.id"), unique=True)
+    language = Column(String, default="en") # en, ur, roman_ur
+    email_notifications = Column(Integer, default=1)
+    proactive_actions = Column(Integer, default=1)
+
+    business = relationship("Business", back_populates="settings")
+

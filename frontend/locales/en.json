@@ -1,0 +1,32 @@
+{
+  "sidebar": {
+    "dashboard": "Dashboard",
+    "ai_employees": "AI Employees",
+    "command_center": "Command Center",
+    "notifications": "Notifications",
+    "settings": "Settings"
+  },
+  "dashboard": {
+    "welcome": "Good morning",
+    "health_score": "Business Health Score",
+    "revenue": "Revenue & Profit Trend",
+    "inventory": "Inventory Alerts",
+    "recommendations": "AI Recommendations",
+    "activity": "Live Workforce Activity"
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Manage your account and platform preferences",
+    "profile": "Profile",
+    "preferences": "Preferences",
+    "api_keys": "API Keys",
+    "security": "Security",
+    "save": "Save Changes",
+    "language": "Language",
+    "language_desc": "Select your preferred language"
+  },
+  "command": {
+    "ask": "Ask the CEO Agent...",
+    "thinking": "CEO Agent is thinking..."
+  }
+}
