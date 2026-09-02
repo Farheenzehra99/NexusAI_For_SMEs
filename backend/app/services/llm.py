@@ -126,7 +126,14 @@ CEO_SYSTEM_PROMPT = (
     "order. If the analysis is incomplete, say so. Keep the answer under "
     "180 words: first answer the question directly (the main causes), "
     "then the health score and risk level, then the top actions in "
-    "priority order. Use Rs for amounts."
+    "priority order. Use Rs for amounts. "
+    "LANGUAGE RULE: You MUST reply in the SAME language and script as "
+    "the owner's question. If the question is in Urdu script (e.g. "
+    "میری سیلز کیوں گر رہی ہے), answer in clear Urdu script. If the "
+    "question is in Roman Urdu (e.g. meri sales kyun gir rahi hain), "
+    "answer in Roman Urdu. If in English, answer in English. Keep the "
+    "same numbers, Rs amounts, and priorities — only the language "
+    "changes."
 )
 
 
@@ -255,12 +262,16 @@ def interpret_ceo_answer(response: CEOAnalysisResponse) -> Optional[str]:
     """Ask the LLM to narrate the already-computed CEO action plan.
 
     The plan, priorities, and evidence are final — the prompt forbids
-    "inventing findings or actions. None on any failure.
+    inventing findings or actions. The LLM also replies in the same
+    language and script as the owner's question (Urdu script, Roman
+    Urdu, or English) so the narration is readable to the shop owner.
+    None on any failure.
     """
     return _chat(
         CEO_SYSTEM_PROMPT,
         "Answer the owner's question using ONLY this finished, verified "
-        "plan. Do not recompute, add, or reorder anything. "
+        "plan. Do not recompute, add, or reorder anything. Reply in the "
+        "same language and script as the owner's question below. "
         f"The owner asked: {response.question}\n"
         "Plan (computed by code, verified):\n"
         + response.model_dump_json(indent=2),

@@ -67,17 +67,53 @@ AGENT_NAMES = {
 }
 
 # A sales/revenue problem needs every lens — this is the demo question.
+# English keywords + Urdu-script + Roman Urdu so Pakistani shop-owners
+# can ask naturally in any script (e.g. "میری سیلز کیوں گر رہی ہے؟" or
+# "meri sales kyun gir rahi hain?"). Multi-word Roman Urdu phrases
+# reduce false-positive substring matches.
 _SALES_PROBLEM_KEYWORDS = (
     "sales", "revenue", "profit", "income",
     "decline", "declining", "down", "falling", "dropping", "losing",
+    # Urdu script
+    "فروخت", "سیلز", "منافع", "کمائی",
+    "گر رہی", "گر رہا", "کم ہو رہی", "کم ہو رہا",
+    # Roman Urdu (multi-word to avoid false positives)
+    "sale gir", "sales gir", "sale kam",
+    "gir rahi", "gir raha", "gir gayi", "gir gaye",
+    "kam ho rahi", "kam ho raha", "kam hai",
+    "bikri", "munafa", "munafaa", "kamai",
 )
-_INVENTORY_KEYWORDS = ("stock", "inventory", "reorder", "supply", "shelf")
-_MARKETING_KEYWORDS = ("campaign", "ad", "ads", "marketing", "budget",
-                       "promotion", "advert")
-_SUPPORT_KEYWORDS = ("customer", "complaint", "delivery", "feedback",
-                     "return", "refund", "courier")
-_FINANCE_KEYWORDS = ("expense", "expenses", "cost", "costs", "margin",
-                     "cash", "money", "pricing")
+_INVENTORY_KEYWORDS = (
+    "stock", "inventory", "reorder", "supply", "shelf",
+    # Urdu script
+    "اسٹاک", "سامان", "گودام", "سپلائی", "آرڈر",
+    # Roman Urdu
+    "stock khatam", "stock kam", "samaan", "order dena",
+)
+_MARKETING_KEYWORDS = (
+    "campaign", "ad", "ads", "marketing", "budget",
+    "promotion", "advert",
+    # Urdu script
+    "اشتہار", "تشہیر", "مارکیٹنگ",
+    # Roman Urdu
+    "ishtihar", "ishtehaar",
+)
+_SUPPORT_KEYWORDS = (
+    "customer", "complaint", "delivery", "feedback",
+    "return", "refund", "courier",
+    # Urdu script
+    "شکایت", "کسٹمر", "ڈیلیوری", "واپسی", "کوریئر", "گاہک",
+    # Roman Urdu
+    "shikayat", "gahak", "waapsi",
+)
+_FINANCE_KEYWORDS = (
+    "expense", "expenses", "cost", "costs", "margin",
+    "cash", "money", "pricing",
+    # Urdu script
+    "خرچ", "اخراجات", "لاگت", "قیمت", "رقم", "پیسے",
+    # Roman Urdu
+    "kharcha", "kharchay", "laagat", "paisa", "paise",
+)
 
 _SALES_ROUTING_REASONS = {
     "finance": "revenue and margin trends diagnose the decline",

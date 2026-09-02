@@ -91,6 +91,36 @@ class TestRouting:
             "finance", "inventory", "marketing", "support",
         }
 
+    # ── Urdu-script + Roman Urdu routing ─────────────────────────────
+
+    def test_urdu_script_sales_question_routes_to_all_four(self):
+        routed = route_question("میری سیلز کیوں گر رہی ہے؟")
+        assert set(routed) == {"finance", "inventory", "marketing", "support"}
+
+    def test_roman_urdu_sales_question_routes_to_all_four(self):
+        routed = route_question("Meri sales kyun gir rahi hain?")
+        assert set(routed) == {"finance", "inventory", "marketing", "support"}
+
+    def test_roman_urdu_profit_decline_routes_to_all_four(self):
+        routed = route_question("Mera munafa kam kyun ho raha hai?")
+        assert set(routed) == {"finance", "inventory", "marketing", "support"}
+
+    def test_urdu_script_stock_question_routes_to_inventory(self):
+        routed = route_question("اسٹاک ختم ہو گیا ہے، دوبارہ آرڈر کروں؟")
+        assert set(routed) == {"inventory"}
+
+    def test_roman_urdu_delivery_complaint_routes_to_support(self):
+        routed = route_question("Delivery ki shikayat kyun hai?")
+        assert set(routed) == {"support"}
+
+    def test_urdu_script_expense_question_routes_to_finance(self):
+        routed = route_question("میرے اخراجات کتنے ہیں؟")
+        assert set(routed) == {"finance"}
+
+    def test_roman_urdu_advertising_question_routes_to_marketing(self):
+        routed = route_question("Mera ishtihar kaam nahi kar raha?")
+        assert set(routed) == {"marketing"}
+
 
 # ── Routing endpoint (GET /api/ceo/route — used by the Command Center) ─────
 
@@ -481,3 +511,46 @@ class TestCEOAgent:
         monkeypatch.setattr(settings, "gemini_api_key", "")
         assert llm_service.is_llm_configured() is False
         assert llm_service.interpret_ceo_answer(response) is None
+
+
+# ── Language support (prompt content, no API calls) ─────────────────────
+
+class TestCEOLanguageSupport:
+    """Verify the LLM prompts carry the language-matching instruction
+    so Gemini narrates the plan in the same language as the owner's
+    question (Urdu script, Roman Urdu, or English)."""
+
+    def test_ceo_system_prompt_contains_language_rule(self):
+        from app.services.llm import CEO_SYSTEM_PROMPT
+        assert "LANGUAGE RULE" in CEO_SYSTEM_PROMPT
+        assert "Urdu script" in CEO_SYSTEM_PROMPT
+        assert "Roman Urdu" in CEO_SYSTEM_PROMPT
+
+    def test_interpret_user_prompt_asks_same_language(self):
+        """The user prompt sent to Gemini must explicitly request the
+        same language and script as the owner's question."""
+        from unittest.mock import patch
+        from app.services.llm import interpret_ceo_answer
+        from app.schemas.ceo import CEOAnswer, CEOAnalysisResponse
+
+        answer = CEOAnswer(
+            question="میری سیلز کیوں گر رہی ہے؟",
+            understood_as="The owner wants to understand why sales have fallen.",
+            routing=[], consulted_agents=[], missing_agents=[],
+            incomplete_analysis=False, key_findings=[],
+            root_causes=[], recommended_actions=[],
+        )
+        response = CEOAnalysisResponse(
+            agent="CEO Agent",
+            question="میری سیلز کیوں گر رہی ہے؟",
+            answer=answer,
+            interpretation="",
+            interpretation_source="fallback",
+            generated_at="2026-09-02T00:00:00",
+        )
+        with patch("app.services.llm._chat", return_value=None) as mock_chat:
+            interpret_ceo_answer(response)
+            assert mock_chat.called
+            user_prompt = mock_chat.call_args[0][1]
+            assert "same language and script" in user_prompt
+            assert "میری سیلز کیوں گر رہی ہے؟" in user_prompt

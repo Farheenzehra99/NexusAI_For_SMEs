@@ -36,8 +36,10 @@ import { formatDateTime } from "@/lib/format";
 
 const sampleQuestions = [
   "Why are my sales going down?",
+  "میری سیلز کیوں گر رہی ہے؟",
   "Which products should I promote more?",
   "How can I improve profit margins?",
+  "Meri delivery ki shikayat kyun hai?",
   "What should I stock for Eid season?",
 ];
 
@@ -445,7 +447,7 @@ function CEOAnswerCard({ res }: { res: CEOAnalysisResponse }) {
       {/* The CEO's plain-language explanation */}
       <div className="p-3 rounded-lg bg-slate-800/40 border border-slate-700/30">
         <p className="text-[10px] uppercase tracking-wider text-slate-500 mb-1.5">CEO Agent</p>
-        <p className="text-sm text-slate-200 leading-relaxed whitespace-pre-line">{res.interpretation}</p>
+        <p dir="auto" className="text-sm text-slate-200 leading-relaxed whitespace-pre-line">{res.interpretation}</p>
       </div>
 
       {/* Key findings */}
@@ -788,7 +790,8 @@ export default function CommandCenterPage() {
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               maxLength={500}
-              placeholder="Ask the CEO Agent anything about your business..."
+              dir="auto"
+              placeholder="Ask the CEO Agent anything — English, Urdu, or Roman Urdu..."
               aria-label="Business question for the CEO Agent"
               className="flex-1 bg-transparent text-white text-sm placeholder-slate-500 outline-none min-w-0"
             />
@@ -805,6 +808,7 @@ export default function CommandCenterPage() {
             {sampleQuestions.map((q) => (
               <button
                 key={q}
+                dir="auto"
                 onClick={() => ask(q)}
                 disabled={loading}
                 className="chip text-xs px-3 py-1.5 rounded-full border border-slate-700/50 text-slate-400 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
@@ -824,7 +828,7 @@ export default function CommandCenterPage() {
               {/* The owner's question */}
               <div className="flex justify-end">
                 <div className="max-w-[85%] px-4 py-2.5 rounded-xl rounded-tr-sm bg-emerald-600/20 border border-emerald-500/30">
-                  <p className="text-sm text-white text-right">{x.question}</p>
+                  <p dir="auto" className="text-sm text-white text-right">{x.question}</p>
                 </div>
               </div>
 
