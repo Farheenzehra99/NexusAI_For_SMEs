@@ -48,9 +48,9 @@ class CustomerSupportAgent(BaseAgent):
 
     # ── Core analysis ──────────────────────────────────────────────────────
 
-    def analyze(self, db: Session, days: int = 30) -> SupportAnalysisResponse:
+    def analyze(self, db: Session, days: int = 30, business_id: int | None = None) -> SupportAnalysisResponse:
         """Produce the full Customer Support Agent response."""
-        facts = get_support_snapshot(db, days=days)
+        facts = get_support_snapshot(db, days=days, business_id=business_id)
 
         interpretation, source = self._interpret(facts)
 

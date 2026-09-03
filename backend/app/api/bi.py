@@ -19,6 +19,9 @@ from ..schemas.bi import BIAnalysisResponse
 from ..agents.base import AGENT_REGISTRY
 from ..services.bi import BusinessNotFoundError, NoBIDataError
 
+from .dependencies import get_current_business
+from ..models.business import Business
+
 router = APIRouter()
 
 BI_AGENT_KEY = "bi_agent"
@@ -32,11 +35,14 @@ def _get_bi_agent():
 
 
 @router.get("/bi/analysis", response_model=BIAnalysisResponse)
-async def bi_analysis(db: Session = Depends(get_db)):
+async def bi_analysis(
+    business: Business = Depends(get_current_business),
+    db: Session = Depends(get_db),
+):
     agent = _get_bi_agent()
 
     try:
-        return agent.analyze(db)
+        return agent.analyze(db, business_id=business.id)
     except (BusinessNotFoundError, NoBIDataError) as exc:
         raise HTTPException(status_code=404, detail=str(exc))
     except SQLAlchemyError:

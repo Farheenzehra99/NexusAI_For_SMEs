@@ -29,6 +29,9 @@ from ..services.ceo import (
     understand_question,
 )
 
+from .dependencies import get_current_business
+from ..models.business import Business
+
 router = APIRouter()
 
 CEO_AGENT_KEY = "ceo_agent"
@@ -75,12 +78,13 @@ async def ceo_analysis(
         max_length=500,
         description="The owner's business question for the CEO Agent.",
     ),
+    business: Business = Depends(get_current_business),
     db: Session = Depends(get_db),
 ):
     agent = _get_ceo_agent()
 
     try:
-        return agent.analyze(db, question=question)
+        return agent.analyze(db, question=question, business_id=business.id)
     except (BusinessNotFoundError, NoBIDataError) as exc:
         raise HTTPException(status_code=404, detail=str(exc))
     except SQLAlchemyError:

@@ -49,9 +49,9 @@ class MarketingAgent(BaseAgent):
 
     # ── Core analysis ──────────────────────────────────────────────────────
 
-    def analyze(self, db: Session) -> MarketingAnalysisResponse:
+    def analyze(self, db: Session, business_id: int | None = None) -> MarketingAnalysisResponse:
         """Produce the full Marketing Agent response."""
-        facts = get_marketing_snapshot(db)
+        facts = get_marketing_snapshot(db, business_id=business_id)
 
         interpretation, source = self._interpret(facts)
 

@@ -69,9 +69,9 @@ class BIAgent(BaseAgent):
 
     # ── Core analysis ──────────────────────────────────────────────────────
 
-    def analyze(self, db: Session) -> BIAnalysisResponse:
+    def analyze(self, db: Session, business_id: int | None = None) -> BIAnalysisResponse:
         """Produce the full BI Agent response."""
-        facts = get_bi_snapshot(db)
+        facts = get_bi_snapshot(db, business_id=business_id)
 
         interpretation, source = self._interpret(facts)
 

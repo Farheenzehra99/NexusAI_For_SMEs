@@ -26,6 +26,8 @@ from ..schemas.dashboard import (
     AgentActivityItem,
 )
 
+from .dependencies import get_current_business
+
 router = APIRouter()
 
 
@@ -34,12 +36,9 @@ router = APIRouter()
 @router.get("/expenses", response_model=ExpenseSummary)
 async def get_expenses(
     month: Optional[str] = Query(None, description="Filter by month (e.g. 'Aug')"),
+    business: Business = Depends(get_current_business),
     db: Session = Depends(get_db),
 ):
-    business = db.query(Business).first()
-    if not business:
-        raise HTTPException(status_code=404, detail="No business data found")
-
     query = db.query(Expense).filter(Expense.business_id == business.id)
     if month:
         query = query.filter(Expense.month == month)
@@ -68,12 +67,9 @@ async def get_expenses(
 @router.get("/daily-sales", response_model=DailySalesResponse)
 async def get_daily_sales(
     product_sku: Optional[str] = Query(None, description="Filter by product SKU"),
+    business: Business = Depends(get_current_business),
     db: Session = Depends(get_db),
 ):
-    business = db.query(Business).first()
-    if not business:
-        raise HTTPException(status_code=404, detail="No business data found")
-
     query = (
         db.query(DailySale, Product)
         .join(Product, DailySale.product_id == Product.id)
@@ -106,11 +102,10 @@ async def get_daily_sales(
 # ── Customers ───────────────────────────────────────────────────────────────
 
 @router.get("/customers", response_model=CustomerListResponse)
-async def get_customers(db: Session = Depends(get_db)):
-    business = db.query(Business).first()
-    if not business:
-        raise HTTPException(status_code=404, detail="No business data found")
-
+async def get_customers(
+    business: Business = Depends(get_current_business),
+    db: Session = Depends(get_db),
+):
     customers = (
         db.query(Customer)
         .filter(Customer.business_id == business.id)
@@ -134,11 +129,10 @@ async def get_customers(db: Session = Depends(get_db)):
 # ── Campaigns ───────────────────────────────────────────────────────────────
 
 @router.get("/campaigns", response_model=CampaignListResponse)
-async def get_campaigns(db: Session = Depends(get_db)):
-    business = db.query(Business).first()
-    if not business:
-        raise HTTPException(status_code=404, detail="No business data found")
-
+async def get_campaigns(
+    business: Business = Depends(get_current_business),
+    db: Session = Depends(get_db),
+):
     campaigns = (
         db.query(MarketingCampaign)
         .filter(MarketingCampaign.business_id == business.id)
@@ -176,12 +170,9 @@ async def get_campaigns(db: Session = Depends(get_db)):
 async def get_support_tickets(
     status: Optional[str] = Query(None),
     ticket_type: Optional[str] = Query(None),
+    business: Business = Depends(get_current_business),
     db: Session = Depends(get_db),
 ):
-    business = db.query(Business).first()
-    if not business:
-        raise HTTPException(status_code=404, detail="No business data found")
-
     query = db.query(SupportTicket).filter(SupportTicket.business_id == business.id)
     if status:
         query = query.filter(SupportTicket.status == status)
@@ -216,12 +207,9 @@ async def get_support_tickets(
 @router.get("/agent-activities", response_model=AgentActivityResponse)
 async def get_agent_activities(
     agent_name: Optional[str] = Query(None),
+    business: Business = Depends(get_current_business),
     db: Session = Depends(get_db),
 ):
-    business = db.query(Business).first()
-    if not business:
-        raise HTTPException(status_code=404, detail="No business data found")
-
     query = db.query(AgentActivity).filter(AgentActivity.business_id == business.id)
     if agent_name:
         query = query.filter(AgentActivity.agent_name == agent_name)

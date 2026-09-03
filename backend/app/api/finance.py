@@ -18,6 +18,9 @@ from ..schemas.finance import FinanceAnalysisResponse
 from ..agents.base import AGENT_REGISTRY
 from ..services.finance import InvalidRangeError, BusinessNotFoundError
 
+from .dependencies import get_current_business
+from ..models.business import Business
+
 router = APIRouter()
 
 FINANCE_AGENT_KEY = "finance_agent"
@@ -33,12 +36,13 @@ def _get_finance_agent():
 @router.get("/finance/analysis", response_model=FinanceAnalysisResponse)
 async def finance_analysis(
     months: int = Query(6, ge=1, le=12, description="Number of months to analyze (1-12)"),
+    business: Business = Depends(get_current_business),
     db: Session = Depends(get_db),
 ):
     agent = _get_finance_agent()
 
     try:
-        return agent.analyze(db, months=months)
+        return agent.analyze(db, months=months, business_id=business.id)
     except InvalidRangeError as exc:
         raise HTTPException(status_code=422, detail=str(exc))
     except BusinessNotFoundError as exc:

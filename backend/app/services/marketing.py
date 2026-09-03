@@ -77,14 +77,17 @@ class NoCampaignDataError(MarketingDataError):
     pass
 
 
-def get_marketing_snapshot(db: Session) -> MarketingFacts:
+def get_marketing_snapshot(db: Session, business_id: int | None = None) -> MarketingFacts:
     """Build the complete deterministic marketing picture.
 
     Raises:
         BusinessNotFoundError: no business record in the database.
         NoCampaignDataError: no campaign records exist.
     """
-    business = db.query(Business).first()
+    if business_id is not None:
+        business = db.get(Business, business_id)
+    else:
+        business = db.query(Business).first()
     if not business:
         raise BusinessNotFoundError("No business found. Run seed.py first.")
 

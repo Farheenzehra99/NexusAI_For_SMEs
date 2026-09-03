@@ -45,9 +45,9 @@ class FinanceAgent(BaseAgent):
 
     # ── Core analysis ──────────────────────────────────────────────────────
 
-    def analyze(self, db: Session, months: int = 6) -> FinanceAnalysisResponse:
+    def analyze(self, db: Session, months: int = 6, business_id: int | None = None) -> FinanceAnalysisResponse:
         """Produce the full Finance Agent response for the last `months` months."""
-        facts = get_financial_snapshot(db, months=months)
+        facts = get_financial_snapshot(db, months=months, business_id=business_id)
 
         interpretation, source = self._interpret(facts)
 

@@ -53,9 +53,9 @@ class CEOAgent(BaseAgent):
 
     # ── Core analysis ──────────────────────────────────────────────────────
 
-    def analyze(self, db: Session, question: str) -> CEOAnalysisResponse:
+    def analyze(self, db: Session, question: str, business_id: int | None = None) -> CEOAnalysisResponse:
         """Produce the full CEO Agent response to the owner's question."""
-        answer = get_ceo_answer(db, question)
+        answer = get_ceo_answer(db, question, business_id=business_id)
 
         response = CEOAnalysisResponse(
             agent=self.name,
@@ -70,7 +70,7 @@ class CEOAgent(BaseAgent):
         # The recorder has its own try/except; this guard is defense in
         # depth so NOTHING escaping it can break the owner's answer.
         try:
-            self._record_activity(db, response)
+            self._record_activity(db, response, business_id=business_id)
         except Exception:
             db.rollback()
 
@@ -86,7 +86,7 @@ class CEOAgent(BaseAgent):
     # ── Agent activity (collaboration log for the UI) ─────────────────────
 
     @staticmethod
-    def _record_activity(db: Session, response: CEOAnalysisResponse) -> None:
+    def _record_activity(db: Session, response: CEOAnalysisResponse, business_id: int | None = None) -> None:
         """Log one row per consulted agent plus the CEO synthesis row.
 
         Best-effort: any failure is rolled back and swallowed so the
@@ -94,8 +94,9 @@ class CEOAgent(BaseAgent):
         """
         answer = response.answer
         try:
-            business = db.query(Business).first()
-            business_id = business.id if business else None
+            if business_id is None:
+                business = db.query(Business).first()
+                business_id = business.id if business else None
 
             # One row per consulted agent: what it contributed.
             findings_by_domain: dict[str, str] = {}

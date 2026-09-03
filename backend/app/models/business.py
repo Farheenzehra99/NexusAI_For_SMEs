@@ -10,6 +10,8 @@ class Business(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False)
+    email = Column(String, unique=True, index=True, nullable=False)
+    password_hash = Column(String, nullable=False)
     tagline = Column(String, default="")
     owner_name = Column(String, nullable=False)
     location = Column(String, default="")
@@ -36,7 +38,7 @@ class Product(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     business_id = Column(Integer, ForeignKey("businesses.id"))
-    sku = Column(String, unique=True, nullable=False)
+    sku = Column(String, index=True, nullable=False)
     name = Column(String, nullable=False)
     category = Column(String, default="")
     price = Column(Float, default=0)

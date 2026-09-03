@@ -74,14 +74,17 @@ AGENT_NAMES = {
 _SALES_PROBLEM_KEYWORDS = (
     "sales", "revenue", "profit", "income",
     "decline", "declining", "down", "falling", "dropping", "losing",
+    "situation", "overall", "performance", "review", "analyze",
     # Urdu script
-    "فروخت", "سیلز", "منافع", "کمائی",
+    "فروخت", "سیلز", "منافع", "کمائی", "کارکردگی", "صورتحال",
     "گر رہی", "گر رہا", "کم ہو رہی", "کم ہو رہا",
     # Roman Urdu (multi-word to avoid false positives)
-    "sale gir", "sales gir", "sale kam",
+    "sale gir", "sales gir", "sale kam", "sales down",
     "gir rahi", "gir raha", "gir gayi", "gir gaye",
     "kam ho rahi", "kam ho raha", "kam hai",
     "bikri", "munafa", "munafaa", "kamai",
+    "current situation", "situation analyze", "business analyze",
+    "kya chal raha", "kaise chal raha",
 )
 _INVENTORY_KEYWORDS = (
     "stock", "inventory", "reorder", "supply", "shelf",
@@ -617,14 +620,14 @@ def get_ceo_answer_from_bi(bi: BIFacts, question: str) -> CEOAnswer:
     )
 
 
-def get_ceo_answer(db: Session, question: str) -> CEOAnswer:
+def get_ceo_answer(db: Session, question: str, business_id: int | None = None) -> CEOAnswer:
     """Route the question, gather the agents' findings, synthesize the plan.
 
     Raises BusinessNotFoundError when there is no business, and
     NoBIDataError when every agent failed (both mapped to HTTP 404).
     Single-domain failures degrade gracefully into an incomplete answer.
     """
-    bi = get_bi_snapshot(db)
+    bi = get_bi_snapshot(db, business_id=business_id)
     return get_ceo_answer_from_bi(bi, question)
 
 

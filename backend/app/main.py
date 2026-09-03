@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from .config import settings
 from .database import engine, Base
-from .api import health, dashboard, data, finance, inventory, marketing, support, bi, ceo, notifications, settings as settings_api
+from .api import health, dashboard, data, finance, inventory, marketing, support, bi, ceo, notifications, settings as settings_api, auth
 from .api.agents import router as agents_router
 
 # Import agents to trigger registration
@@ -42,6 +42,7 @@ app.include_router(bi.router, prefix="/api", tags=["bi"])
 app.include_router(ceo.router, prefix="/api", tags=["ceo"])
 app.include_router(notifications.router, prefix="/api", tags=["notifications"])
 app.include_router(settings_api.router, prefix="/api", tags=["settings"])
+app.include_router(auth.router, prefix="/api", tags=["auth"])
 
 @app.get("/")
 async def root():

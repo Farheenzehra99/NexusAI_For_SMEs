@@ -22,6 +22,9 @@ from ..services.inventory import (
     NoSalesDataError,
 )
 
+from .dependencies import get_current_business
+from ..models.business import Business
+
 router = APIRouter()
 
 INVENTORY_AGENT_KEY = "inventory_agent"
@@ -36,13 +39,14 @@ def _get_inventory_agent():
 
 @router.get("/inventory/analysis", response_model=InventoryAnalysisResponse)
 async def inventory_analysis(
-    days: int = Query(30, ge=7, le=90, description="Sales velocity window in days (7-90)"),
+    days: int = Query(30, ge=7, le=90, description="Velocity window in days (7-90)"),
+    business: Business = Depends(get_current_business),
     db: Session = Depends(get_db),
 ):
     agent = _get_inventory_agent()
 
     try:
-        return agent.analyze(db, days=days)
+        return agent.analyze(db, days=days, business_id=business.id)
     except InvalidRangeError as exc:
         raise HTTPException(status_code=422, detail=str(exc))
     except (BusinessNotFoundError, NoSalesDataError) as exc:

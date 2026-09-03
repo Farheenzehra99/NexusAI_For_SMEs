@@ -22,6 +22,9 @@ from ..services.support import (
     NoTicketDataError,
 )
 
+from .dependencies import get_current_business
+from ..models.business import Business
+
 router = APIRouter()
 
 SUPPORT_AGENT_KEY = "customer_support_agent"
@@ -36,18 +39,14 @@ def _get_support_agent():
 
 @router.get("/support/analysis", response_model=SupportAnalysisResponse)
 async def support_analysis(
-    days: int = Query(
-        default=30,
-        ge=7,
-        le=90,
-        description="Analysis window in days, counting back from the most recent ticket.",
-    ),
+    days: int = Query(30, ge=7, le=90, description="Feedback window in days (7-90)"),
+    business: Business = Depends(get_current_business),
     db: Session = Depends(get_db),
 ):
     agent = _get_support_agent()
 
     try:
-        return agent.analyze(db, days=days)
+        return agent.analyze(db, days=days, business_id=business.id)
     except InvalidRangeError as exc:
         raise HTTPException(status_code=422, detail=str(exc))
     except (BusinessNotFoundError, NoTicketDataError) as exc:

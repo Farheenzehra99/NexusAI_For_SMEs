@@ -4,6 +4,7 @@ from pydantic import BaseModel
 
 from ..database import get_db
 from ..models.business import UserSettings, Business
+from .dependencies import get_current_business
 
 router = APIRouter()
 
@@ -13,12 +14,14 @@ class SettingsUpdate(BaseModel):
     proactive_actions: bool = None
 
 @router.get("/settings")
-def get_settings(db: Session = Depends(get_db)):
-    # Assuming business_id=1
-    settings = db.query(UserSettings).filter(UserSettings.business_id == 1).first()
+def get_settings(
+    db: Session = Depends(get_db),
+    business: Business = Depends(get_current_business)
+):
+    settings = db.query(UserSettings).filter(UserSettings.business_id == business.id).first()
     if not settings:
         # Auto-create default settings
-        settings = UserSettings(business_id=1, language="en", email_notifications=1, proactive_actions=1)
+        settings = UserSettings(business_id=business.id, language="en", email_notifications=1, proactive_actions=1)
         db.add(settings)
         db.commit()
         db.refresh(settings)
@@ -30,10 +33,15 @@ def get_settings(db: Session = Depends(get_db)):
     }
 
 @router.patch("/settings")
-def update_settings(update: SettingsUpdate, db: Session = Depends(get_db)):
-    settings = db.query(UserSettings).filter(UserSettings.business_id == 1).first()
+def update_settings(
+    update: SettingsUpdate,
+    db: Session = Depends(get_db),
+    business: Business = Depends(get_current_business)
+):
+    settings = db.query(UserSettings).filter(UserSettings.business_id == business.id).first()
     if not settings:
-        raise HTTPException(status_code=404, detail="Settings not found")
+        settings = UserSettings(business_id=business.id, language="en", email_notifications=1, proactive_actions=1)
+        db.add(settings)
 
     if update.language is not None:
         settings.language = update.language
@@ -43,4 +51,9 @@ def update_settings(update: SettingsUpdate, db: Session = Depends(get_db)):
         settings.proactive_actions = 1 if update.proactive_actions else 0
         
     db.commit()
+    return {
+        "language": settings.language,
+        "email_notifications": bool(settings.email_notifications),
+        "proactive_actions": bool(settings.proactive_actions)
+    }
     return {"success": True}

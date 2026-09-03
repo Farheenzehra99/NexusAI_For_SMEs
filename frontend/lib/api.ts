@@ -10,22 +10,49 @@ export class ApiError extends Error {
   }
 }
 
-export async function fetchApi<T>(path: string, timeoutMs = 120000): Promise<T> {
+export async function fetchApi<T>(
+  path: string,
+  initOrTimeout: RequestInit | number = 120000,
+  timeoutMs = 120000
+): Promise<T> {
+  let init: RequestInit = {};
+  let timeout = timeoutMs;
+  if (typeof initOrTimeout === "number") {
+    timeout = initOrTimeout;
+  } else if (typeof initOrTimeout === "object") {
+    init = initOrTimeout;
+  }
+
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  const timer = setTimeout(() => controller.abort(), timeout);
   try {
+    const token = typeof window !== "undefined" ? localStorage.getItem("nexusai_token") : null;
+    const headers: Record<string, string> = {
+      ...(init.headers as Record<string, string>),
+    };
+    if (token && !headers["Authorization"]) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+    if (init.body && typeof init.body === "string" && !headers["Content-Type"]) {
+      headers["Content-Type"] = "application/json";
+    }
+
     const res = await fetch(`${API_BASE}${path}`, {
+      ...init,
+      headers,
       cache: "no-store",
       signal: controller.signal,
     });
     if (!res.ok) {
-      // FastAPI errors are {"detail": "..."} — surface them cleanly.
       let detail = "";
       try {
         const body = await res.json();
         if (body && typeof body.detail === "string") detail = body.detail;
       } catch {
         detail = await res.text().catch(() => "");
+      }
+      if (res.status === 401) {
+        throw new ApiError(401, detail || "Authentication required. Please login.");
       }
       if (res.status === 404) {
         throw new ApiError(404, detail || "Not found. Is the backend seeded?");
@@ -44,6 +71,81 @@ export async function fetchApi<T>(path: string, timeoutMs = 120000): Promise<T> 
     throw new ApiError(0, "Cannot reach the backend. Is it running on port 8000?");
   } finally {
     clearTimeout(timer);
+  }
+}
+
+// ── Auth APIs ───────────────────────────────────────────────────────────────
+
+export interface AuthBusiness {
+  id: number;
+  name: string;
+  owner_name: string;
+  email: string;
+  location?: string;
+  tagline?: string;
+  established_year?: number;
+  total_customers?: number;
+  health_score?: number;
+}
+
+export interface AuthResponse {
+  access_token: string;
+  token_type: string;
+  business: AuthBusiness;
+}
+
+export async function loginUser(email: string, password: string): Promise<AuthResponse> {
+  const res = await fetchApi<AuthResponse>("/api/auth/login", {
+    method: "POST",
+    body: JSON.stringify({ email, password }),
+  });
+  if (typeof window !== "undefined" && res.access_token) {
+    localStorage.setItem("nexusai_token", res.access_token);
+    localStorage.setItem("nexusai_user", JSON.stringify(res.business));
+  }
+  return res;
+}
+
+export async function signupUser(data: {
+  business_name: string;
+  owner_name: string;
+  email: string;
+  password: string;
+  location?: string;
+  tagline?: string;
+}): Promise<AuthResponse> {
+  const res = await fetchApi<AuthResponse>("/api/auth/signup", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+  if (typeof window !== "undefined" && res.access_token) {
+    localStorage.setItem("nexusai_token", res.access_token);
+    localStorage.setItem("nexusai_user", JSON.stringify(res.business));
+  }
+  return res;
+}
+
+export async function getMe(): Promise<AuthBusiness> {
+  return fetchApi<AuthBusiness>("/api/auth/me");
+}
+
+export async function updateProfile(data: {
+  business_name: string;
+  owner_name: string;
+  location: string;
+  tagline: string;
+}): Promise<{ message: string; business: AuthBusiness }> {
+  return fetchApi("/api/auth/profile", {
+    method: "PUT",
+    body: JSON.stringify(data),
+  });
+}
+
+export function logoutUser(): void {
+  if (typeof window !== "undefined") {
+    localStorage.removeItem("nexusai_token");
+    localStorage.removeItem("nexusai_user");
+    window.location.href = "/login";
   }
 }
 

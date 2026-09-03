@@ -73,14 +73,13 @@ class NoSalesDataError(InventoryDataError):
     pass
 
 
-def get_inventory_snapshot(db: Session, days: int = 30) -> InventoryFacts:
+def get_inventory_snapshot(db: Session, days: int = 30, business_id: int | None = None) -> InventoryFacts:
     """Build the complete deterministic inventory picture.
 
     Args:
         db: database session.
-        days: requested velocity window (7-90 calendar days). The actual
-              window shrinks to the available data span when fewer days
-              of daily sales exist.
+        days: requested velocity window (7-90 calendar days).
+        business_id: scope to this business (required for multi-tenancy).
 
     Raises:
         InvalidRangeError: days outside [MIN_WINDOW_DAYS, MAX_WINDOW_DAYS].
@@ -92,7 +91,10 @@ def get_inventory_snapshot(db: Session, days: int = 30) -> InventoryFacts:
             f"days must be between {MIN_WINDOW_DAYS} and {MAX_WINDOW_DAYS}, got {days}"
         )
 
-    business = db.query(Business).first()
+    if business_id is not None:
+        business = db.get(Business, business_id)
+    else:
+        business = db.query(Business).first()
     if not business:
         raise BusinessNotFoundError("No business found. Run seed.py first.")
 

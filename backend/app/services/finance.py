@@ -73,7 +73,7 @@ def _sort_key(m: MonthlySale):
     return (m.year, MONTH_ORDER.get(m.month, 0))
 
 
-def get_financial_snapshot(db: Session, months: int = 6) -> FinanceFacts:
+def get_financial_snapshot(db: Session, months: int = 6, business_id: int | None = None) -> FinanceFacts:
     """Build the complete deterministic financial picture.
 
     Raises:
@@ -85,7 +85,10 @@ def get_financial_snapshot(db: Session, months: int = 6) -> FinanceFacts:
             f"months must be between {MIN_MONTHS} and {MAX_MONTHS}, got {months}"
         )
 
-    business = db.query(Business).first()
+    if business_id is not None:
+        business = db.get(Business, business_id)
+    else:
+        business = db.query(Business).first()
     if not business:
         raise BusinessNotFoundError("No business found. Run seed.py first.")
 

@@ -17,6 +17,9 @@ from ..schemas.marketing import MarketingAnalysisResponse
 from ..agents.base import AGENT_REGISTRY
 from ..services.marketing import BusinessNotFoundError, NoCampaignDataError
 
+from .dependencies import get_current_business
+from ..models.business import Business
+
 router = APIRouter()
 
 MARKETING_AGENT_KEY = "marketing_agent"
@@ -30,11 +33,14 @@ def _get_marketing_agent():
 
 
 @router.get("/marketing/analysis", response_model=MarketingAnalysisResponse)
-async def marketing_analysis(db: Session = Depends(get_db)):
+async def marketing_analysis(
+    business: Business = Depends(get_current_business),
+    db: Session = Depends(get_db),
+):
     agent = _get_marketing_agent()
 
     try:
-        return agent.analyze(db)
+        return agent.analyze(db, business_id=business.id)
     except (BusinessNotFoundError, NoCampaignDataError) as exc:
         raise HTTPException(status_code=404, detail=str(exc))
     except SQLAlchemyError:

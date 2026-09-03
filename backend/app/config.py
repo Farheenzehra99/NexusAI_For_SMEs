@@ -9,6 +9,9 @@ class Settings(BaseSettings):
     gemini_api_key: str = ""
     gemini_model: str = "gemini-3.5-flash-lite"
     llm_timeout_seconds: int = 30
+    jwt_secret_key: str = "nexusai-sme-growth-os-super-secret-key-2026"
+    jwt_algorithm: str = "HS256"
+    jwt_expiration_minutes: int = 60 * 24 * 7  # 7 days
     debug: bool = True
 
     @property

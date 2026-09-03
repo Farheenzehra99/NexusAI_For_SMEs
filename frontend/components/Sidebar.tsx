@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -13,8 +13,11 @@ import {
   Settings,
   ChevronLeft,
   Loader2,
+  User as UserIcon,
+  LogOut,
 } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
+import { getMe, logoutUser, type AuthBusiness } from "@/lib/api";
 
 function useWorkforceActive(): boolean {
   const [active, setActive] = useState(false);
@@ -30,7 +33,9 @@ function useWorkforceActive(): boolean {
 
 export default function Sidebar({ children }: { children: React.ReactNode }) {
   const [collapsed, setCollapsed] = useState(false);
+  const [business, setBusiness] = useState<AuthBusiness | null>(null);
   const pathname = usePathname();
+  const router = useRouter();
   const workforceActive = useWorkforceActive();
   const { t } = useLanguage();
 
@@ -42,7 +47,31 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (window.matchMedia("(max-width: 767px)").matches) setCollapsed(true);
-  }, []);
+    
+    // Check local storage or backend for active authenticated business
+    const cached = localStorage.getItem("nexusai_user");
+    if (cached) {
+      try {
+        setBusiness(JSON.parse(cached));
+      } catch {}
+    }
+
+    getMe()
+      .then((data) => {
+        setBusiness(data);
+        localStorage.setItem("nexusai_user", JSON.stringify(data));
+      })
+      .catch(() => {
+        // If 401 or not authenticated, redirect to login
+        if (pathname !== "/login" && pathname !== "/signup") {
+          router.push("/login");
+        }
+      });
+  }, [pathname, router]);
+
+  const initials = business?.owner_name
+    ? business.owner_name.slice(0, 2).toUpperCase()
+    : "AA";
 
   return (
     <div className="flex h-screen overflow-hidden bg-[#0a0f18] text-white">
@@ -68,8 +97,12 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
                 exit={{ opacity: 0, x: -10 }}
                 className="min-w-0 overflow-hidden whitespace-nowrap"
               >
-                <div className="text-sm font-bold bg-clip-text text-transparent bg-gradient-to-r from-emerald-100 to-emerald-400">NexusAI for SMEs</div>
-                <p className="text-[11px] text-slate-400">AI-Powered Workforce</p>
+                <div className="text-sm font-bold bg-clip-text text-transparent bg-gradient-to-r from-emerald-100 to-emerald-400">
+                  NexusAI for SMEs
+                </div>
+                <p className="text-[11px] text-slate-400 truncate">
+                  {business?.name || "AI-Powered Workforce"}
+                </p>
               </motion.div>
             )}
           </AnimatePresence>
@@ -130,16 +163,16 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
           })}
         </nav>
 
-        {/* Bottom */}
-        <div className="p-4 border-t border-white/5 space-y-2">
+        {/* Bottom Panel */}
+        <div className="p-4 border-t border-white/5 space-y-1">
           <Link href="/notifications" className="block relative">
             <motion.div
               whileHover={{ scale: 1.02, backgroundColor: "rgba(255,255,255,0.05)" }}
               whileTap={{ scale: 0.98 }}
-              className={`flex items-center gap-3 px-3 py-3 rounded-xl text-sm transition-colors ${pathname === '/notifications' ? 'bg-white/5 text-white' : 'text-slate-400 hover:text-white'}`}
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors ${pathname === '/notifications' ? 'bg-white/5 text-white' : 'text-slate-400 hover:text-white'}`}
             >
               <div className="relative">
-                <Bell size={20} className="flex-shrink-0" />
+                <Bell size={18} className="flex-shrink-0" />
                 <span className="absolute top-0 right-0 w-2 h-2 bg-rose-500 rounded-full border-2 border-[#0e1522]" />
               </div>
               <AnimatePresence>
@@ -156,9 +189,9 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
             <motion.div
               whileHover={{ scale: 1.02, backgroundColor: "rgba(255,255,255,0.05)" }}
               whileTap={{ scale: 0.98 }}
-              className={`flex items-center gap-3 px-3 py-3 rounded-xl text-sm transition-colors ${pathname === '/settings' ? 'bg-white/5 text-white' : 'text-slate-400 hover:text-white'}`}
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors ${pathname === '/settings' ? 'bg-white/5 text-white' : 'text-slate-400 hover:text-white'}`}
             >
-              <Settings size={20} className="flex-shrink-0" />
+              <Settings size={18} className="flex-shrink-0" />
               <AnimatePresence>
                 {!collapsed && (
                   <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="whitespace-nowrap overflow-hidden">
@@ -168,6 +201,43 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
               </AnimatePresence>
             </motion.div>
           </Link>
+
+          <Link href="/profile" className="block relative">
+            <motion.div
+              whileHover={{ scale: 1.02, backgroundColor: "rgba(255,255,255,0.05)" }}
+              whileTap={{ scale: 0.98 }}
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors ${pathname === '/profile' ? 'bg-white/5 text-white' : 'text-slate-400 hover:text-white'}`}
+            >
+              <UserIcon size={18} className="flex-shrink-0 text-emerald-400" />
+              <AnimatePresence>
+                {!collapsed && (
+                  <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="whitespace-nowrap overflow-hidden">
+                    Business Profile
+                  </motion.span>
+                )}
+              </AnimatePresence>
+            </motion.div>
+          </Link>
+
+          <button
+            onClick={logoutUser}
+            className="w-full text-left block relative"
+          >
+            <motion.div
+              whileHover={{ scale: 1.02, backgroundColor: "rgba(244,63,94,0.1)" }}
+              whileTap={{ scale: 0.98 }}
+              className="flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-rose-400 hover:text-rose-300 transition-colors"
+            >
+              <LogOut size={16} className="flex-shrink-0" />
+              <AnimatePresence>
+                {!collapsed && (
+                  <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="whitespace-nowrap overflow-hidden text-xs">
+                    Sign Out
+                  </motion.span>
+                )}
+              </AnimatePresence>
+            </motion.div>
+          </button>
         </div>
 
         {/* Collapse */}
@@ -190,8 +260,12 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
         <header className="sticky top-0 z-10 bg-[#070b12]/80 backdrop-blur-xl border-b border-white/5 px-6 sm:px-10 py-4 h-[73px] flex items-center">
           <div className="flex items-center justify-between w-full">
             <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
-              <h2 className="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-emerald-100 to-emerald-300">Ali Garments</h2>
-              <p className="text-xs text-emerald-500/60 font-medium tracking-wide">HYDERABAD, PAKISTAN</p>
+              <h2 className="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-emerald-100 to-emerald-300">
+                {business?.name || "Ahmed Clothing Store"}
+              </h2>
+              <p className="text-xs text-emerald-500/60 font-medium tracking-wide uppercase">
+                {business?.location || "PAKISTAN"}
+              </p>
             </motion.div>
             
             <div className="flex items-center gap-6">
@@ -209,18 +283,21 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
                 ) : (
                   <>
                     <motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ repeat: Infinity, duration: 2 }} className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)]" />
-                    <span className="text-xs text-slate-300 font-medium">Agents Online</span>
+                    <span className="text-xs text-slate-300 font-medium">6 Agents Online</span>
                   </>
                 )}
               </motion.div>
               
-              <motion.button
-                whileHover={{ scale: 1.05, ring: 2 }}
-                whileTap={{ scale: 0.95 }}
-                className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-sm font-bold text-orange-950 shadow-[0_0_15px_rgba(245,158,11,0.2)] ring-2 ring-transparent hover:ring-amber-500/40 transition-shadow"
-              >
-                AA
-              </motion.button>
+              <Link href="/profile">
+                <motion.button
+                  whileHover={{ scale: 1.05, ring: 2 }}
+                  whileTap={{ scale: 0.95 }}
+                  title="View Business Profile"
+                  className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-sm font-bold text-orange-950 shadow-[0_0_15px_rgba(245,158,11,0.2)] ring-2 ring-transparent hover:ring-amber-500/40 transition-shadow"
+                >
+                  {initials}
+                </motion.button>
+              </Link>
             </div>
           </div>
         </header>

@@ -155,14 +155,17 @@ def _complete_sentiments(records: list[dict]) -> None:
 # Main entry point
 # ---------------------------------------------------------------------------
 
-def get_support_snapshot(db: Session, days: int = 30) -> SupportFacts:
-    """Build the deterministic support facts for the default business."""
+def get_support_snapshot(db: Session, days: int = 30, business_id: int | None = None) -> SupportFacts:
+    """Build the deterministic support facts for the authenticated business."""
     if not (MIN_WINDOW_DAYS <= days <= MAX_WINDOW_DAYS):
         raise InvalidRangeError(
             f"days must be between {MIN_WINDOW_DAYS} and {MAX_WINDOW_DAYS}."
         )
 
-    business = db.query(Business).first()
+    if business_id is not None:
+        business = db.get(Business, business_id)
+    else:
+        business = db.query(Business).first()
     if business is None:
         raise BusinessNotFoundError("No business found.")
 

@@ -147,6 +147,27 @@ export default function DashboardPage() {
           </Link>
         </motion.div>
 
+        {/* SME Growth OS Value Proposition Ribbon */}
+        <motion.div 
+          variants={itemVariants}
+          className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-emerald-950/40 via-blue-950/30 to-purple-950/40 border border-emerald-500/20 p-4 shadow-lg backdrop-blur-md"
+        >
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <span className="flex h-2.5 w-2.5 rounded-full bg-emerald-400 shadow-[0_0_10px_#34d399] animate-pulse" />
+              <p className="text-xs text-slate-300 font-medium leading-relaxed">
+                <span className="font-bold text-emerald-300">SME Growth OS:</span> Your complete autonomous AI workforce — <span className="text-white font-semibold">CEO, Accountant, Warehouse Manager, Marketer, Support Rep & BI Analyst</span> working together to protect and grow your revenue.
+              </p>
+            </div>
+            <Link 
+              href="/ai-employees" 
+              className="text-[11px] font-bold text-emerald-400 hover:text-emerald-300 whitespace-nowrap flex items-center gap-1 hover:underline"
+            >
+              Meet All 6 Agents <ArrowRight size={12} />
+            </Link>
+          </div>
+        </motion.div>
+
         {/* Metrics Row */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 lg:gap-5">
           {/* Health Score */}
@@ -279,6 +300,71 @@ export default function DashboardPage() {
             ) : (
               <div className="flex items-center justify-center flex-1 text-sm text-slate-500">All good.</div>
             )}
+          </motion.div>
+        </div>
+
+        {/* Top & Weak Performing Products (Blueprint Section 6) */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+          {/* Top Performers */}
+          <motion.div variants={itemVariants} className="bg-[#0e1522]/60 backdrop-blur-md border border-white/5 rounded-2xl p-6 shadow-xl">
+            <div className="flex items-center justify-between mb-5">
+              <div className="flex items-center gap-2">
+                <div className="p-1.5 bg-emerald-500/10 rounded-lg">
+                  <TrendingUp size={16} className="text-emerald-400" />
+                </div>
+                <h2 className="text-sm font-bold text-white tracking-wide">Top Revenue Drivers</h2>
+              </div>
+              <span className="text-[11px] font-semibold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">Growth Leaders</span>
+            </div>
+            <div className="space-y-3">
+              {data.top_products && data.top_products.length > 0 ? (
+                data.top_products.slice(0, 4).map((p, idx) => (
+                  <div key={idx} className="flex items-center justify-between p-3 rounded-xl bg-white/[0.03] border border-white/5 hover:border-emerald-500/30 transition-colors">
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-semibold text-slate-200 truncate">{p.name}</p>
+                      <p className="text-[11px] text-slate-400 mt-0.5">{p.sales} units sold · Stock: {p.stock_qty ?? '—'}</p>
+                    </div>
+                    <div className="text-right ml-4">
+                      <p className="text-sm font-bold text-emerald-400">{formatPKR(p.revenue)}</p>
+                      <span className="text-[10px] uppercase font-bold text-emerald-500/80">Top Seller</span>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p className="text-xs text-slate-500 py-4 text-center">No sales data recorded yet.</p>
+              )}
+            </div>
+          </motion.div>
+
+          {/* Weak Performers */}
+          <motion.div variants={itemVariants} className="bg-[#0e1522]/60 backdrop-blur-md border border-white/5 rounded-2xl p-6 shadow-xl">
+            <div className="flex items-center justify-between mb-5">
+              <div className="flex items-center gap-2">
+                <div className="p-1.5 bg-rose-500/10 rounded-lg">
+                  <TrendingDown size={16} className="text-rose-400" />
+                </div>
+                <h2 className="text-sm font-bold text-white tracking-wide">Underperforming / Overstocked</h2>
+              </div>
+              <span className="text-[11px] font-semibold text-rose-400 bg-rose-500/10 px-2 py-0.5 rounded-full">Requires Attention</span>
+            </div>
+            <div className="space-y-3">
+              {data.weak_products && data.weak_products.length > 0 ? (
+                data.weak_products.slice(0, 4).map((p, idx) => (
+                  <div key={idx} className="flex items-center justify-between p-3 rounded-xl bg-white/[0.03] border border-white/5 hover:border-rose-500/30 transition-colors">
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-semibold text-slate-200 truncate">{p.name}</p>
+                      <p className="text-[11px] text-rose-400/90 mt-0.5">{p.reason || `${p.sales} units sold`} · Stock: {p.stock_qty ?? '—'}</p>
+                    </div>
+                    <div className="text-right ml-4">
+                      <p className="text-sm font-bold text-slate-300">{formatPKR(p.revenue)}</p>
+                      <span className="text-[10px] uppercase font-bold text-rose-400/70">Low Velocity</span>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p className="text-xs text-slate-500 py-4 text-center">No weak products identified.</p>
+              )}
+            </div>
           </motion.div>
         </div>
 

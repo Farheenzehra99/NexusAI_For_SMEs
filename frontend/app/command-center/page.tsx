@@ -35,12 +35,12 @@ import {
 import { formatDateTime } from "@/lib/format";
 
 const sampleQuestions = [
+  "Meri sales kam kyun ho rahi hain aur mujhe kya karna chahiye?",
+  "Business ki current situation analyze karo",
   "Why are my sales going down?",
+  "Meri delivery ki shikayat kyun hai?",
   "میری سیلز کیوں گر رہی ہے؟",
   "Which products should I promote more?",
-  "How can I improve profit margins?",
-  "Meri delivery ki shikayat kyun hai?",
-  "What should I stock for Eid season?",
 ];
 
 const SEVERITY_DOT: Record<string, string> = {

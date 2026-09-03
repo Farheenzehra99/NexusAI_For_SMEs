@@ -47,14 +47,15 @@ class InventoryAgent(BaseAgent):
 
     # ── Core analysis ──────────────────────────────────────────────────────
 
-    def analyze(self, db: Session, days: int = 30) -> InventoryAnalysisResponse:
+    def analyze(self, db: Session, days: int = 30, business_id: int | None = None) -> InventoryAnalysisResponse:
         """Produce the full Inventory Agent response.
 
         Args:
             db: database session.
             days: velocity window in days (7-90).
+            business_id: scope to authenticated business.
         """
-        facts = get_inventory_snapshot(db, days=days)
+        facts = get_inventory_snapshot(db, days=days, business_id=business_id)
 
         interpretation, source = self._interpret(facts)
 

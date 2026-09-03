@@ -597,7 +597,7 @@ _SUBSCORERS = {
 }
 
 
-def get_bi_snapshot(db: Session) -> BIFacts:
+def get_bi_snapshot(db: Session, business_id: int | None = None) -> BIFacts:
     """Assemble one business picture from the four agent snapshots.
 
     Each domain is loaded independently; a failing domain is marked
@@ -605,7 +605,10 @@ def get_bi_snapshot(db: Session) -> BIFacts:
     when there is no business at all, and NoBIDataError when EVERY
     domain failed.
     """
-    business = db.query(Business).first()
+    if business_id is not None:
+        business = db.get(Business, business_id)
+    else:
+        business = db.query(Business).first()
     if business is None:
         raise BusinessNotFoundError("No business found.")
 
@@ -614,7 +617,7 @@ def get_bi_snapshot(db: Session) -> BIFacts:
     for domain in DOMAIN_ORDER:
         loader, error_cls = _LOADERS[domain]
         try:
-            facts_by_domain[domain] = loader(db)
+            facts_by_domain[domain] = loader(db, business_id=business.id)
         except error_cls:
             missing.append(domain)
 

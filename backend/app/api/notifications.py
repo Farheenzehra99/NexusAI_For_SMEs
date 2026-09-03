@@ -6,6 +6,7 @@ from sse_starlette.sse import EventSourceResponse
 
 from ..database import get_db
 from ..models.business import Notification, Business
+from .dependencies import get_current_business
 
 router = APIRouter()
 
@@ -24,9 +25,16 @@ def notify_clients(notification: Notification):
         })
 
 @router.get("/notifications")
-def get_notifications(db: Session = Depends(get_db)):
-    # Assuming business_id=1 for demo
-    notifications = db.query(Notification).filter(Notification.business_id == 1).order_by(Notification.created_at.desc()).all()
+def get_notifications(
+    db: Session = Depends(get_db),
+    business: Business = Depends(get_current_business)
+):
+    notifications = (
+        db.query(Notification)
+        .filter(Notification.business_id == business.id)
+        .order_by(Notification.created_at.desc())
+        .all()
+    )
     return [{
         "id": n.id,
         "type": n.type,

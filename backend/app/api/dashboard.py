@@ -44,6 +44,7 @@ from ..schemas.dashboard import (
 )
 from ..services.bi import get_bi_snapshot, NoBIDataError, BusinessNotFoundError
 from ..services.ceo import get_ceo_answer_from_bi
+from .dependencies import get_current_business
 
 router = APIRouter()
 
@@ -58,10 +59,10 @@ _MONTH_NAMES = [
 
 
 @router.get("/dashboard", response_model=DashboardResponse)
-async def get_dashboard(db: Session = Depends(get_db)):
-    business = db.query(Business).first()
-    if not business:
-        raise HTTPException(status_code=404, detail="No business data found. Run seed.py first.")
+async def get_dashboard(
+    db: Session = Depends(get_db),
+    business: Business = Depends(get_current_business),
+):
 
     # ── Revenue & Profit Metrics (current month, month-over-month) ──
     sales = (
@@ -132,7 +133,7 @@ async def get_dashboard(db: Session = Depends(get_db)):
     inventory_products_by_sku = {}
 
     try:
-        bi = get_bi_snapshot(db)
+        bi = get_bi_snapshot(db, business_id=business.id)
         ceo_answer = get_ceo_answer_from_bi(bi, _DASHBOARD_QUESTION)
 
         hs = ceo_answer.health_score
