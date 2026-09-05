@@ -1,0 +1,19 @@
+schema_version: 1
+locale: en-US
+branch: Q0DeR-MaG1C-BrAnCh-Fo2-NoN-GiT-Or-No-C0MmIt
+nodes_managed: true
+exported_at: "2026-09-05T17:30:00Z"
+modules:
+    "":
+        dir_name: NexusAI AI Workforce Platform
+        title: NexusAI AI Workforce Platform
+        scope:
+            - backend/app/**/*.py
+            - frontend/app/**/*.tsx
+            - frontend/components/**/*.tsx
+            - frontend/lib/**/*.ts
+            - frontend/context/**/*.tsx
+        source_files: []
+        children: []
+        depends_on: []
+        related_to: []

@@ -1,0 +1,10 @@
+- Each AI agent follows a strict three-layer pattern: (1) deterministic service layer in `app/services/<domain>.py`, (2) optional LLM narration in `app/services/llm.py`, (3) agent orchestration module in `app/agents/<domain>.py`. The LLM never calculates or invents numbers — it only narrates already-computed facts.
+- Agent modules call `register_agent(ClassName())` at the bottom of the file to self-register into the global `AGENT_REGISTRY` dict. Import order in `main.py` triggers registration.
+- Pydantic schemas live in `app/schemas/` and mirror the agent domains: `finance.py`, `inventory.py`, `marketing.py`, `support.py`, `bi.py`, `ceo.py`. All response schemas include `agent`, `interpretation`, `interpretation_source`, and `generated_at` fields.
+- Every agent implements a `_fallback_interpretation()` static method that builds a template string from the structured facts — this is the deterministic safety net when the LLM is unavailable.
+- API routers live in `app/api/` and are registered in `main.py` with `app.include_router(router, prefix="/api", tags=["<tag>"])`.
+- Frontend pages use the `"use client"` directive and wrap content in the `Sidebar` layout component. State is managed via `useState`/`useEffect` hooks; no global state library.
+- Frontend API calls go through `fetchApi<T>()` in `lib/api.ts` which handles JWT injection, timeouts, and typed errors. All response types are declared as TypeScript interfaces in the same file.
+- Animation variants use framer-motion with `as const` assertions for literal transition values (required by framer-motion Variants type).
+- Multilingual support uses dot-notation translation keys (e.g., `t("sidebar.dashboard")`) loaded from locale JSON files in `frontend/locales/`.
+- Backend configuration uses Pydantic Settings with `.env` file support; the `Settings` singleton is imported as `from .config import settings`.

@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "locale": "en-US",
+  "project_name": "NexusAI for SMEs",
+  "generated_at": "2026-09-05T17:30:00Z",
+  "content_files": [
+    "Project Overview.md",
+    "Getting Started.md",
+    "Technical Implementation.md",
+    "Core Features/Core Features.md"
+  ],
+  "knowledge_modules": [
+    {
+      "path": "",
+      "title": "NexusAI AI Workforce Platform",
+      "files": [
+        "overview.md",
+        "architecture_design.md",
+        "tech_stack.md",
+        "coding_conventions.md",
+        "unique_setup_and_commands.md",
+        "_module.yaml"
+      ]
+    },
+    {
+      "path": "Business Glossary",
+      "title": "Business Glossary",
+      "files": [
+        "Business Glossary.md"
+      ]
+    }
+  ],
+  "source_scan": {
+    "backend": {
+      "framework": "FastAPI 0.115",
+      "orm": "SQLAlchemy 2.0.35",
+      "database": "SQLite",
+      "auth": "bcrypt + PyJWT",
+      "llm": "Google Gemini (gemini-3.5-flash-lite)",
+      "agents": 6,
+      "api_routers": 12,
+      "models": 11,
+      "test_files": 9
+    },
+    "frontend": {
+      "framework": "Next.js 14.2.15",
+      "ui": "React 18.3.1",
+      "styling": "Tailwind CSS 3.4.19",
+      "animations": "framer-motion 13.2.0",
+      "charts": "Recharts 2.12.7",
+      "icons": "lucide-react 0.453.0",
+      "languages": 3,
+      "pages": 8,
+      "components": 2
+    }
+  }
+}
